@@ -1,34 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-# In[1]:
-
-
 import pandas as pd, matplotlib.pyplot as plt, numpy as np, tkinter as tk
-
-
-# In[2]:
-
-
 from tkinter import *
-
-
-# In[3]:
-
-
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 
-
-# In[4]:
-
-
 ## File open
-
-
-# In[5]:
-
-
 root = Tk()
 root.title("Open File")
 root.geometry('200x100+2500+500')# winodw size plus position
@@ -42,63 +19,17 @@ btn = Button(root,text='Open File', command = openFile)
 btn.pack()
 root.mainloop()
 
-
-# In[6]:
-
-
 # read data in to dataframe
-
-
-# In[7]:
-
-
 df = pd.read_csv(fileName, index_col = False) 
-
-
-# In[8]:
-
-
 dfr = df[['Time','End Entity','Az(T)','Rng','Alt']] # extract the columns needed for polar plot
-
-
-# In[9]:
-
-
 dfr.columns = dfr.columns.str.strip() #strip out white space
-
-
-# In[10]:
-
-
 dfr.columns = dfr.columns.str.replace(' ', '')#strip out white space
-
-
-# In[11]:
-
-
 dfr = dfr.dropna() # drop all NaN entries
 
-
-# In[12]:
-
-
 entities = dfr.EndEntity.unique() # get list of unique values in this column
-
-
-# In[13]:
-
-
 entities = entities.tolist() # convert to list for use in selection form
 
-
-# In[14]:
-
-
 Plots=[] #list that will hold items to plot
-
-
-# In[15]:
-
 
 #Function to select items to plot
 def SelectPlots():
@@ -124,27 +55,13 @@ def SelectPlots():
     root.mainloop()
 
 
-# In[16]:
-
-
 SelectPlots() # call select plots function
-
-
-# In[17]:
-
 
 pColor = {'Red':'r', 'Blue':'b', 'Green':'g', 'Black':'k', 'Cyan':'c', 'Magenta':'m',"Yellow":'y','White':'w'} #dictionary to hold plot colours
 
-
-# In[18]:
-
-
 plotColor=[] # empty list for plot colours
 
-
-# In[19]:
-
-
+#function to select colour for plot of each item
 def selectColor():
     
     root = tk.Tk()
@@ -171,10 +88,7 @@ def selectColor():
 
     root.mainloop()
 
-
-# In[20]:
-
-
+# plot out the items to MatPlotLib
 ax = plt.subplot(111, projection = 'polar') #matplot lib polar plot
 ax.set_theta_zero_location ('N')
 ax.set_theta_direction(-1)
@@ -196,22 +110,4 @@ for item in Plots:
     
 plt.savefig('Polar.png')    # save plot to graphic
 plt.show() #show plot
-
-
-# In[21]:
-
-
-plotColor=[] #reset colors
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
