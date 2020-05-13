@@ -6,18 +6,19 @@ from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 
 ## File open
-root = Tk()
-root.title("Open File")
-root.geometry('200x100+2500+500')# winodw size plus position
+def get_filename():
 
-def openFile():
-    global fileName
-    fileName = askopenfilename()
+    root = Tk()
+    root.geometry('200x100+2500+500')# winodw size plus position
+    options = {'parent':root, 'title':'Select file to process','filetypes':[('CSV Files','*.csv')]}
+    filename = askopenfilename(**options)
+
+    if filename == "":
+        return False
     root.destroy()
-    
-btn = Button(root,text='Open File', command = openFile)
-btn.pack()
-root.mainloop()
+    return filename 
+
+fileName = get_filename()
 
 # read data in to dataframe
 df = pd.read_csv(fileName, index_col = False) 
