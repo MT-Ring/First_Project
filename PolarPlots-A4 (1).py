@@ -66,7 +66,7 @@ plotColor=[] # empty list for plot colours
 def selectColor():
     
     root = tk.Tk()
-    root.title("Choose Plot Color for plot " + str(i+1))
+    root.title("Choose Plot Color for plot " + str(index+1))
     root.geometry('300x200+2500+500')
 
     listbox1 = Listbox(root, width=20,)
@@ -80,6 +80,7 @@ def selectColor():
         selection = listbox1.get(ANCHOR)
         entry1.insert(0,pColor[selection])
         plotColor.append(selection) #add selected from list to plotColor[] list
+        print(plotColor)
         root.destroy()
         
     btn = Button(root, text="Select", command=select)
@@ -95,20 +96,16 @@ ax.set_theta_zero_location ('N')
 ax.set_theta_direction(-1)
 ax.grid(True)
 ax.tick_params(axis = 'y', colors='r')
-i=0 # set loop to go through each item selected for plotting
 
-for item in Plots:
+for index,value in enumerate(Plots):
     
-    df1 = dfr.loc[dfr['EndEntity'] == item] # plot where 'EndEntity is in Plots[] list
+    df1 = dfr.loc[dfr['EndEntity'] == value] # plot where 'EndEntity is in Plots[] list
     theta = np.deg2rad(df1['Az(T)']) # degrees to radians of bearing
     rng = df1['Rng'] #range
     selectColor() # call setcolor to change clour for each item
-    
-    ax.plot(theta, rng, c = plotColor[i])
-    i+=1 # incremetn loop
-    
+    ax.plot(theta, rng, c = plotColor[index])
+
     
     
 plt.savefig('Polar.png')    # save plot to graphic
 plt.show() #show plot
-
