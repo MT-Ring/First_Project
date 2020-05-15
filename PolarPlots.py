@@ -6,18 +6,19 @@ from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 
 ## File open
-root = Tk()
-root.title("Open File")
-root.geometry('200x100+2500+500')# winodw size plus position
+def get_filename():
 
-def openFile():
-    global fileName
-    fileName = askopenfilename()
+    root = Tk()
+    root.geometry('200x100+2500+500')# winodw size plus position
+    options = {'parent':root, 'title':'Select file to process','filetypes':[('CSV Files','*.csv')]}
+    filename = askopenfilename(**options)
+
+    if filename == "":
+        return False
     root.destroy()
-    
-btn = Button(root,text='Open File', command = openFile)
-btn.pack()
-root.mainloop()
+    return filename 
+
+fileName = get_filename()
 
 # read data in to dataframe
 df = pd.read_csv(fileName, index_col = False) 
@@ -58,56 +59,81 @@ def SelectPlots():
 SelectPlots() # call select plots function
 
 pColor = {'Red':'r', 'Blue':'b', 'Green':'g', 'Black':'k', 'Cyan':'c', 'Magenta':'m',"Yellow":'y','White':'w'} #dictionary to hold plot colours
+lStyle = {'Solid':'-','Dashed':'--', 'Dash-Dot':'-.','Dotted':':'}
 
 plotColor=[] # empty list for plot colours
+LineStyle = [] #empty list for Line sytles
 
 #function to select colour for plot of each item
 def selectColor():
     
     root = tk.Tk()
-    root.title("Choose Plot Color for plot " + str(i+1))
+    root.title("Choose Plot Color for plot " + str(index+1))
     root.geometry('300x200+2500+500')
-
-    listbox1 = Listbox(root, width=20,)
-    for x,y in enumerate(pColor): # populate list from pColor dictionary and....
-        listbox1.insert(x+1,y)
-    listbox1.pack(anchor = tk.CENTER)
-    
     
     def select():
-        entry1.delete(0, 'end')
-        selection = listbox1.get(ANCHOR)
-        entry1.insert(0,pColor[selection])
-        plotColor.append(selection) #add selected from list to plotColor[] list
-        root.destroy()
+        for key in listbox1.selection_get().split():
+            plotColor.append(pColor[key]) #add selected from list to plotColor[] list
+            root.destroy()
         
+    listbox1 = Listbox(root, width=20,)
+    for key in pColor: # populate list from pColor dictionary and....
+        listbox1.insert('end', key)
+    listbox1.grid(row=0, column =0)
+    listbox1.pack(anchor = tk.CENTER)
     btn = Button(root, text="Select", command=select)
     btn.pack()
     
-    entry1 = Entry(root, width=20)
 
     root.mainloop()
 
-# plot out the items to MatPlotLib
+def selectStyle():
+    
+    root = tk.Tk()
+    root.title("Choose Style for plot " + value)
+    root.geometry('300x200+2500+500')
+
+    
+    def select():
+        for key in listbox1.selection_get().split():
+            LineStyle.append(lStyle[key]) #add selected from list to plotColor[] list
+            root.destroy()    
+    
+    
+    listbox1 = Listbox(root, width=20,)
+    for key in lStyle: # populate list from pColor dictionary and....
+        listbox1.insert('end', key)
+    listbox1.grid(row=0, column =0)
+    listbox1.pack(anchor = tk.CENTER)
+    btn = Button(root, text="Select", command=select)
+    btn.pack()
+  
+
+    root.mainloop()  
+    
+    
+#plot the targets
+fig = plt.figure(figsize=(10,10))
 ax = plt.subplot(111, projection = 'polar') #matplot lib polar plot
 ax.set_theta_zero_location ('N')
 ax.set_theta_direction(-1)
 ax.grid(True)
 ax.tick_params(axis = 'y', colors='r')
-i=0 # set loop to go through each item selected for plotting
 
-for item in Plots:
+for index,value in enumerate(Plots):
     
-    df1 = dfr.loc[dfr['EndEntity'] == item] # plot where 'EndEntity is in Plots[] list
+    df1 = dfr.loc[dfr['EndEntity'] == value] # plot where 'EndEntity is in Plots[] list
     theta = np.deg2rad(df1['Az(T)']) # degrees to radians of bearing
     rng = df1['Rng'] #range
     selectColor() # call setcolor to change clour for each item
-    
-    ax.plot(theta, rng, c = plotColor[i])
-    i+=1 # incremetn loop
-    
-    
-    
+    selectStyle()
+    ax.plot(theta, rng, c = plotColor[index], linestyle=LineStyle[index],label = value)
+
+ax.legend()    
 plt.savefig('Polar.png')    # save plot to graphic
 plt.show() #show plot
+
+plotColor = [] # empty lists
+LineStyle = [] # empty lists
+
 
